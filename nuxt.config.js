@@ -85,9 +85,7 @@ export default {
           process.env.NODE_ENV === 'development' ? 12345 : undefined
       },
       storage: true,
-      database: {
-        emulatorPort: process.env.NODE_ENV === 'development' ? 9000 : undefined
-      },
+      database: true,
       performance: true,
       analytics: true,
       remoteConfig: {
@@ -129,7 +127,7 @@ export default {
   // },
   // Axios module configuration (https://go.nuxtjs.dev/config-axios)
   axios: {
-    proxy: true,
+    proxy: true
   },
 
   // Vuetify module configuration (https://go.nuxtjs.dev/config-vuetify)

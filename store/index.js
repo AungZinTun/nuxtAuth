@@ -18,7 +18,7 @@ const createStore = () => {
         state.ip = payload
       },
       RESET_STORE: (state) => {
-        Object.assign(state, state)
+        state.authUser = null
       },
 
       SET_AUTH_USER: (state, { authUser }) => {
@@ -31,9 +31,8 @@ const createStore = () => {
     actions: {
       async onAuthStateChanged ({ commit, dispatch }, { authUser }) {
         if (!authUser) {
-          console.log('noUser')
           commit('RESET_STORE')
-          dispatch('createUser')
+          dispatch('getIP')
           return
         }
         if (authUser && authUser.getIdToken) {
@@ -46,9 +45,9 @@ const createStore = () => {
         }
         commit('SET_AUTH_USER', { authUser })
       },
-      async createUser ({ store }, { email, password }) {
+      async registerUser ({ store }, { email, password }) {
         try {
-          console.log(this.$fire)
+          // console.log(this.$fire)
           await this.$fire.auth.createUserWithEmailAndPassword(
             email,
             password
@@ -57,14 +56,26 @@ const createStore = () => {
           alert(e)
         }
       },
-      getIP ({ state, getters, rootState, commit }) {
+      getIP ({ state, getters, rootState, commit, dispatch }) {
         return new Promise((resolve, reject) => {
-          fetch('https://ipapi.co/json/')
+          fetch('https://api.ipify.org?format=json')
             .then(x => x.json())
             .then((ip) => {
-              // const email = ip.ip
-              // console.log(email, 'email')
+              // commit to state
               commit('SET_IP', ip)
+              const userId = ip.ip.replace(/[\W_]+/g, '-')
+              const email = 'auto' + userId + '@gmail.com'
+              const password = ip.ip
+              const ref = this.$fire.database.ref('users').child(userId)
+              ref.once('value', (snapshot) => {
+                if (snapshot.exists()) {
+                  console.log(snapshot)
+                } else {
+                  console.log('no user with this IP creating')
+                  dispatch('registerUser', { email, password })
+                    .then(user => console.log(user))
+                }
+              })
             })
         })
       },
@@ -77,18 +88,6 @@ const createStore = () => {
         } catch (e) {
           alert(e)
         }
-      },
-      signInWithGoogle ({ commit }) {
-        return new Promise((resolve, reject) => {
-          this.$fire.auth.signInWithRedirect('GoogleProvider')
-          resolve()
-        })
-      },
-
-      signOut ({ commit }) {
-        this.$fire.auth.signOut().then(() => {
-          commit('setUser', null)
-        }).catch(err => console.log('error'))
       }
     }
   })

@@ -4,7 +4,7 @@
       <v-card-text>
         <v-text-field v-model="formData.email" />
         <v-text-field v-model="formData.password" />
-        <v-btn @click="createUser">
+        <v-btn @click="registerUser">
           Register
         </v-btn>
         <v-btn @click="signInUser">
@@ -43,9 +43,9 @@ export default Vue.extend({
     }
   }),
   methods: {
-    async createUser () {
+    async registerUser () {
       try {
-        await this.$store.dispatch('createUser',
+        await this.$store.dispatch('registerUser',
           {
             email: this.formData.email,
             password: this.formData.password
