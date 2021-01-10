@@ -62,6 +62,8 @@ const createStore = () => {
           fetch('https://ipapi.co/json/')
             .then(x => x.json())
             .then((ip) => {
+              // const email = ip.ip
+              // console.log(email, 'email')
               commit('SET_IP', ip)
             })
         })
